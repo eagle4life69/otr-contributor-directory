@@ -4,6 +4,8 @@ Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
 Version: 1.0.0
 Author: Andrew Rhynes
+GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
+GitHub Branch: main
 */
 
 if (!defined('ABSPATH')) exit;
@@ -29,20 +31,28 @@ function ocd_render_contributor($atts) {
     $atts = shortcode_atts(['name' => ''], $atts);
     if (!$atts['name']) return '<p>No contributor specified.</p>';
 
-    $tag = $atts['name'];
+    $tags = array_map('trim', explode(',', $atts['name']));
+
     $args = [
         'post_type' => 'post',
         'posts_per_page' => -1,
-        'tag' => $tag,
+        'tag_slug__in' => $tags,
     ];
     $query = new WP_Query($args);
 
     $episodes_by_show = [];
+    $seen_post_ids = [];
 
     while ($query->have_posts()) {
         $query->the_post();
+        $post_id = get_the_ID();
+
+        // Skip duplicate posts
+        if (in_array($post_id, $seen_post_ids)) continue;
+        $seen_post_ids[] = $post_id;
+
         $title = get_the_title();
-        preg_match('/\\((\\d{2})-(\\d{2})-(\\d{2})\\)/', $title, $matches);
+        preg_match('/\((\d{2})-(\d{2})-(\d{2})\)/', $title, $matches);
         $year = $matches ? ('19' . $matches[3]) : 'Unknown';
 
         $categories = get_the_category();
@@ -51,7 +61,7 @@ function ocd_render_contributor($atts) {
         if (!isset($episodes_by_show[$root_cat])) $episodes_by_show[$root_cat] = [];
         if (!isset($episodes_by_show[$root_cat][$year])) $episodes_by_show[$root_cat][$year] = [];
 
-        $download_url = get_post_meta(get_the_ID(), 'enclosure', true);
+        $download_url = get_post_meta($post_id, 'enclosure', true);
 
         $episodes_by_show[$root_cat][$year][] = [
             'title' => $title,
@@ -63,7 +73,7 @@ function ocd_render_contributor($atts) {
 
     ob_start();
     echo '<div class="otr-contributor-directory">';
-    echo '<h2>' . esc_html(str_replace('_', ' ', $tag)) . '</h2>';
+    echo '<h2>' . esc_html(str_replace('_', ' ', $tags[0])) . '</h2>';
 
     echo '<div class="tabs">';
     $tab_index = 0;
@@ -79,7 +89,7 @@ function ocd_render_contributor($atts) {
         foreach ($years as $year => $episodes) {
             echo '<h3>' . esc_html($year) . '</h3><ul>';
             foreach ($episodes as $ep) {
-                echo '<li><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a>";
+                echo '<li><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a>';
                 if ($ep['download']) echo ' - <a href="' . esc_url($ep['download']) . '">Download</a>';
                 echo '</li>';
             }
@@ -110,3 +120,4 @@ function ocd_enqueue_styles() {
     </style>';
 }
 add_action('wp_head', 'ocd_enqueue_styles');
+
