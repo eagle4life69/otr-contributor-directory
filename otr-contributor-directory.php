@@ -2,10 +2,26 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.0.0
+Version: 1.0.1
 Author: Andrew Rhynes
+Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
 GitHub Branch: main
+
+== Description ==
+OTR Contributor Directory helps you display episode appearances by actors, writers, and other contributors.
+
+== How to Use ==
+- Create a page for a contributor (e.g., William Conrad).
+- Add the shortcode: [otr_contributor name="William_Conrad"]
+- To include multiple aliases, use a comma-separated list: [otr_contributor name="William_Conrad,Bill_Conrad"]
+
+== Features ==
+- Automatically groups episodes by Show (via root category)
+- Further breaks down by Year (parsed from title in MM-DD-YY format)
+- Displays PowerPress download links for each episode
+- Tabs allow for clean navigation of show/year structure
+- Dynamically updates as new episodes are added
 */
 
 if (!defined('ABSPATH')) exit;
