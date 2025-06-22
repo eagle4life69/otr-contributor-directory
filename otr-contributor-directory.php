@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.0.4
+Version: 1.0.5
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -61,33 +61,68 @@ function ocd_render_contributor($atts) {
     $episodes_by_show = [];
     $seen_post_ids = [];
 
-    while ($query->have_posts()) {
-        $query->the_post();
-        $post_id = get_the_ID();
+while ($query->have_posts()) {
+    $query->the_post();
+    $post_id = get_the_ID();
 
-        // Skip duplicate posts
-        if (in_array($post_id, $seen_post_ids)) continue;
-        $seen_post_ids[] = $post_id;
+    // Skip duplicate posts
+    if (in_array($post_id, $seen_post_ids)) continue;
+    $seen_post_ids[] = $post_id;
 
-        $title = get_the_title();
-        preg_match('/\((\d{2})-(\d{2})-(\d{2})\)/', $title, $matches);
-        $year = $matches ? ('19' . $matches[3]) : 'Unknown';
+    $full = get_the_title();
 
-        $categories = get_the_category();
-        $root_cat = $categories ? $categories[0]->name : 'Unknown';
+    // Parse MM-DD-YY from title
+    preg_match('/\((\d{2})-(\d{2})-(\d{2})\)$/', $full, $m);
+    $month = $m[1] ?? '';
+    $day   = $m[2] ?? '';
+    $year  = $m[3] ?? '';
+    $date  = ($month && $day && $year) ? "$month-$day-19$year" : '';
+    $sortable = ($year && $month && $day) ? intval("19$year$month$day") : 0;
+    $year_full = ($year) ? "19$year" : 'Unknown';
 
-        if (!isset($episodes_by_show[$root_cat])) $episodes_by_show[$root_cat] = [];
-        if (!isset($episodes_by_show[$root_cat][$year])) $episodes_by_show[$root_cat][$year] = [];
-
-        $download_url = get_post_meta($post_id, 'enclosure', true);
-
-        $episodes_by_show[$root_cat][$year][] = [
-            'title' => $title,
-            'permalink' => get_permalink(),
-            'download' => $download_url,
-        ];
+    // Title parsing logic
+    if (strpos($full, ' | ') !== false) {
+        $parts = explode(' | ', $full);
+    } else {
+        $parts = explode(' – ', $full);
     }
-    wp_reset_postdata();
+    $title = $parts[0];
+
+    // Get MP3 + Episode ID
+    $meta = get_post_meta($post_id, 'enclosure', true);
+    $mp3 = '';
+    $eid = '';
+    if ($meta) {
+        $lines = explode("\n", $meta);
+        foreach ($lines as $ln) {
+            if (strpos($ln, 'download.mp3') !== false) {
+                $mp3 = trim($ln);
+                if (preg_match('/episodes\/(\d+)\/download\.mp3/', $mp3, $idm)) {
+                    $eid = $idm[1];
+                }
+                break;
+            }
+        }
+    }
+
+    $categories = get_the_category();
+    $root_cat = $categories ? $categories[0]->name : 'Unknown';
+
+    if (!isset($episodes_by_show[$root_cat])) $episodes_by_show[$root_cat] = [];
+    if (!isset($episodes_by_show[$root_cat][$year_full])) $episodes_by_show[$root_cat][$year_full] = [];
+
+    $episodes_by_show[$root_cat][$year_full][] = [
+        'title' => $title,
+        'date' => $date,
+        'sortable' => $sortable,
+        'mp3' => $mp3,
+        'eid' => $eid,
+        'permalink' => get_permalink(),
+        'download' => $mp3,
+    ];
+}
+wp_reset_postdata();
+
 
     ob_start();
     echo '<div class="otr-contributor-directory">';
@@ -105,43 +140,39 @@ function ocd_render_contributor($atts) {
     foreach ($episodes_by_show as $show => $years) {
         echo '<div class="tab-content" id="tab-' . $tab_index . '" style="display: ' . ($tab_index === 0 ? 'block' : 'none') . '">';
         foreach ($years as $year => $episodes) {
+          // Sort episodes by date
+usort($episodes, function ($a, $b) {
+    return $a['sortable'] <=> $b['sortable'];
+});
     echo '<h3>' . esc_html($year) . '</h3>';
     echo '<table class="otr-table"><thead><tr><th>Episode Title</th><th>Download</th></tr></thead><tbody>';
     foreach ($episodes as $ep) {
         echo '<tr>';
         echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
         echo '<td>';
-        if ($ep['download']) echo '<a href="' . esc_url($ep['download']) . '" download>Download</a>';
+        if ($ep['eid'] && $ep['download']) {
+    echo '<a class="otr-download-button" href="' . esc_url($ep['download']) . '" target="_blank" rel="noopener noreferrer" title="Download">';
+    echo '<span class="elementor-icon-list-icon"><i class="fas fa-cloud-download-alt"></i></span> Download</a>';
+}
         echo '</td>';
         echo '</tr>';
     }
     echo '</tbody></table>';
-    echo '<div class="otr-download-all"><a class="otr-download-button" href="#" onclick="downloadAllEpisodes(' . esc_js(json_encode(array_column($episodes, 'download'))) . '); return false;">Download All Episodes</a></div>';
+    $eids = array_filter(array_column($episodes, 'eid'));
+$eid_list = implode(',', $eids);
+echo '<div class="otr-download-all">';
+if ($eid_list) {
+    echo '<a class="otr-download-button" target="_blank" href="https://www.otrwesterns.com/mp3/download.php?ep=' . esc_attr($eid_list) . '">Download All Episodes</a>';
+}
+echo '</div>';
+
 }
         echo '</div>';
         $tab_index++;
     }
 
     echo '</div>';
-    echo '<script>
-        function showTab(index) {
-            document.querySelectorAll(".tab-content").forEach((el, i) => {
-                el.style.display = (i === index ? "block" : "none");
-            });
-        }
-        function downloadAllEpisodes(links) {
-            links.forEach(link => {
-                if (link) {
-                    const a = document.createElement("a");
-                    a.href = link;
-                    a.download = "";
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                }
-            });
-        }
-    </script>';
+    wp_enqueue_script('otr-contributor-js', plugins_url('otr-contributor.js', __FILE__), [], null, true);
 
     return ob_get_clean();
 }
