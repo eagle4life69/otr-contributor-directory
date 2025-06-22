@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.0.6.2
+Version: 1.0.7
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -23,7 +23,8 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - Displays PowerPress download links for each episode
 - Clean table layout with Elementor-style download icons
 - Includes a "Download All Episodes" button using custom handler
-- Alphabetically ordered shows with episodes sorted by date
+- Alphabetically ordered shows and years
+- Nested year tab buttons per show to reduce scrolling
 - External JavaScript file for better performance and maintenance
 */
 
@@ -139,6 +140,7 @@ wp_reset_postdata();
 
     echo '<div class="tabs">';
     $tab_index = 0;
+    ksort($episodes_by_show);
     foreach (array_keys($episodes_by_show) as $show_name) {
     $years = $episodes_by_show[$show_name];
         echo '<button class="tab-button" onclick="showTab(' . $tab_index . ')">' . esc_html($show_name) . '</button>';
@@ -147,29 +149,49 @@ wp_reset_postdata();
     echo '</div>';
 
     $tab_index = 0;
+    ksort($episodes_by_show);
     foreach (array_keys($episodes_by_show) as $show_name) {
     $years = $episodes_by_show[$show_name];
 
         echo '<div class="tab-content" id="tab-' . $tab_index . '" style="display: ' . ($tab_index === 0 ? 'block' : 'none') . '">';
+        ksort($years);
+        ksort($years);
+        echo '<div class="year-tabs">';
+        foreach (array_keys($years) as $i => $year) {
+            echo '<button class="tab-button year-tab" onclick="showYearTab(' . $tab_index . ', ' . $i . ')">' . esc_html($year) . '</button>';
+        }
+        echo '</div>';
+
+        $year_index = 0;
         foreach ($years as $year => $episodes) {
-          // Sort episodes by date
-usort($episodes, function ($a, $b) {
-    return $a['sortable'] <=> $b['sortable'];
-});
-    echo '<h3>' . esc_html($year) . '</h3>';
-    echo '<table class="otr-table"><thead><tr><th>Episode Title</th><th>Download</th></tr></thead><tbody>';
-    foreach ($episodes as $ep) {
-        echo '<tr>';
-        echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
-        echo '<td>';
-        if ($ep['eid'] && $ep['download']) {
-    echo '<a class="otr-download-button" href="' . esc_url($ep['download']) . '" target="_blank" rel="noopener noreferrer" title="Download">';
-    echo '<span class="elementor-icon-list-icon"><i class="fas fa-cloud-download-alt"></i></span> Download</a>';
-}
-        echo '</td>';
-        echo '</tr>';
-    }
-    echo '</tbody></table>';
+            usort($episodes, function ($a, $b) {
+                return $a['sortable'] <=> $b['sortable'];
+            });
+            echo '<div class="year-content tab-' . $tab_index . '-year-' . $year_index . '" style="display:' . ($year_index === 0 ? 'block' : 'none') . '">';
+            echo '<h3>' . esc_html($year) . '</h3>';
+            echo '<table class="otr-table"><thead><tr><th>Episode Title</th><th>Download</th></tr></thead><tbody>';
+            foreach ($episodes as $ep) {
+                echo '<tr>';
+                echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
+                echo '<td>';
+                if ($ep['eid'] && $ep['download']) {
+                    echo '<a class="otr-download-button" href="' . esc_url($ep['download']) . '" target="_blank" rel="noopener noreferrer" title="Download">';
+                    echo '<span class="elementor-icon-list-icon"><i class="fas fa-cloud-download-alt"></i></span> Download</a>';
+                }
+                echo '</td>';
+                echo '</tr>';
+            }
+            echo '</tbody></table>';
+            $eids = array_filter(array_column($episodes, 'eid'));
+            $eid_list = implode(',', $eids);
+            echo '<div class="otr-download-all">';
+            if ($eid_list) {
+                echo '<a class="otr-download-button" target="_blank" href="https://www.otrwesterns.com/mp3/download.php?ep=' . esc_attr($eid_list) . '">Download All Episodes</a>';
+            }
+            echo '</div>';
+            echo '</div>';
+            $year_index++;
+        }
     $eids = array_filter(array_column($episodes, 'eid'));
 $eid_list = implode(',', $eids);
 echo '<div class="otr-download-all">';
