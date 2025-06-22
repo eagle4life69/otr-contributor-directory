@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.0.5
+Version: 1.0.6
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -18,12 +18,13 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 
 == Features ==
 - Automatically groups episodes by Show (via root category)
-- Further breaks down by Year (parsed from title in MM-DD-YY format)
+- Ignores categories with "Season" in the name
+- Groups further by Year (parsed from title in MM-DD-YY format)
 - Displays PowerPress download links for each episode
-- Clean table layout with Download buttons
-- Includes a "Download All Episodes" button per year group
-- Tabs allow for clean navigation of show/year structure
-- Dynamically updates as new episodes are added
+- Clean table layout with Elementor-style download icons
+- Includes a "Download All Episodes" button using custom handler
+- Alphabetically ordered shows with episodes sorted by date
+- External JavaScript file for better performance and maintenance
 */
 
 if (!defined('ABSPATH')) exit;
@@ -106,7 +107,15 @@ while ($query->have_posts()) {
     }
 
     $categories = get_the_category();
-    $root_cat = $categories ? $categories[0]->name : 'Unknown';
+    $root_cat = 'Unknown';
+    if ($categories) {
+        foreach ($categories as $cat) {
+            if (stripos($cat->name, 'Season') === false) {
+                $root_cat = $cat->name;
+                break;
+            }
+        }
+    }
 
     if (!isset($episodes_by_show[$root_cat])) $episodes_by_show[$root_cat] = [];
     if (!isset($episodes_by_show[$root_cat][$year_full])) $episodes_by_show[$root_cat][$year_full] = [];
@@ -130,14 +139,16 @@ wp_reset_postdata();
 
     echo '<div class="tabs">';
     $tab_index = 0;
-    foreach ($episodes_by_show as $show => $years) {
+    foreach (array_keys($episodes_by_show) as \$show_name) {
+    \$years = \$episodes_by_show[\$show_name];
         echo '<button class="tab-button" onclick="showTab(' . $tab_index . ')">' . esc_html($show) . '</button>';
         $tab_index++;
     }
     echo '</div>';
 
     $tab_index = 0;
-    foreach ($episodes_by_show as $show => $years) {
+    foreach (array_keys($episodes_by_show) as \$show_name) {
+    \$years = \$episodes_by_show[\$show_name];
         echo '<div class="tab-content" id="tab-' . $tab_index . '" style="display: ' . ($tab_index === 0 ? 'block' : 'none') . '">';
         foreach ($years as $year => $episodes) {
           // Sort episodes by date
