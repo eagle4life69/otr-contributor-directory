@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.0.3
+Version: 1.0.4
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -20,6 +20,8 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - Automatically groups episodes by Show (via root category)
 - Further breaks down by Year (parsed from title in MM-DD-YY format)
 - Displays PowerPress download links for each episode
+- Clean table layout with Download buttons
+- Includes a "Download All Episodes" button per year group
 - Tabs allow for clean navigation of show/year structure
 - Dynamically updates as new episodes are added
 */
@@ -103,14 +105,19 @@ function ocd_render_contributor($atts) {
     foreach ($episodes_by_show as $show => $years) {
         echo '<div class="tab-content" id="tab-' . $tab_index . '" style="display: ' . ($tab_index === 0 ? 'block' : 'none') . '">';
         foreach ($years as $year => $episodes) {
-            echo '<h3>' . esc_html($year) . '</h3><ul>';
-            foreach ($episodes as $ep) {
-                echo '<li><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a>';
-                if ($ep['download']) echo ' - <a href="' . esc_url($ep['download']) . '">Download</a>';
-                echo '</li>';
-            }
-            echo '</ul>';
-        }
+    echo '<h3>' . esc_html($year) . '</h3>';
+    echo '<table class="otr-table"><thead><tr><th>Episode Title</th><th>Download</th></tr></thead><tbody>';
+    foreach ($episodes as $ep) {
+        echo '<tr>';
+        echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
+        echo '<td>';
+        if ($ep['download']) echo '<a href="' . esc_url($ep['download']) . '" download>Download</a>';
+        echo '</td>';
+        echo '</tr>';
+    }
+    echo '</tbody></table>';
+    echo '<div class="otr-download-all"><a class="otr-download-button" href="#" onclick="downloadAllEpisodes(' . esc_js(json_encode(array_column($episodes, 'download'))) . '); return false;">Download All Episodes</a></div>';
+}
         echo '</div>';
         $tab_index++;
     }
@@ -120,6 +127,18 @@ function ocd_render_contributor($atts) {
         function showTab(index) {
             document.querySelectorAll(".tab-content").forEach((el, i) => {
                 el.style.display = (i === index ? "block" : "none");
+            });
+        }
+        function downloadAllEpisodes(links) {
+            links.forEach(link => {
+                if (link) {
+                    const a = document.createElement("a");
+                    a.href = link;
+                    a.download = "";
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
             });
         }
     </script>';
@@ -133,7 +152,21 @@ function ocd_enqueue_styles() {
     echo '<style>
         .tab-button { margin: 0 5px; padding: 6px 12px; cursor: pointer; }
         .tab-content { margin-top: 10px; }
+        .otr-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .otr-table th, .otr-table td { padding: 8px 10px; border: 1px solid #ccc; text-align: left; }
+        .otr-table th { background-color: #f4f4f4; }
+        .otr-download-all { margin: 10px 0; text-align: right; }
+        .otr-download-button {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #0073aa;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .otr-download-button:hover {
+            background-color: #005177;
+        }
     </style>';
 }
 add_action('wp_head', 'ocd_enqueue_styles');
-
