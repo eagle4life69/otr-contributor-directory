@@ -3,7 +3,7 @@ Contributors: eagle4life69
 Tags: actors, old time radio, podcast, shortcode, directory  
 Requires at least: 5.0  
 Tested up to: 6.5  
-Stable tag: 1.0.6  
+Stable tag: 1.0.7  
 Requires PHP: 7.2  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,7 +12,7 @@ A dynamic plugin that displays grouped episode listings by show and year for act
 
 == Description ==
 
-OTR Contributor Directory lets you build contributor profiles for your OTRWesterns.com podcast. It dynamically displays grouped episode listings by show and year with sortable tables and download buttons. Fully integrates with PowerPress and your custom bulk-download endpoint.
+OTR Contributor Directory lets you build contributor pages for your OTRWesterns.com podcast. It dynamically lists episodes featuring each contributor, grouped by show and year, and styled for easy navigation and quick access to downloads. Ideal for highlighting actors, writers, or other roles.
 
 == How to Use ==
 
@@ -24,18 +24,22 @@ OTR Contributor Directory lets you build contributor profiles for your OTRWester
 
 == Features ==
 
-- Group episodes by root Show category (ignores subcategories with “Season”)
-- Further grouped by Year from post title `(MM-DD-YY)`
-- PowerPress enclosure used for MP3 download links
-- Episode tables styled for readability
-- Individual downloads styled with Elementor-style icons
-- “Download All Episodes” button points to your custom PHP handler
-- Alphabetical ordering of show tabs
-- Episodes sorted chronologically within each year
-- Shortcode-driven, supports aliases
-- External JS file (no inline scripts)
+- Automatically groups episodes by Show (from root category)
+- Ignores categories with "Season" in the name
+- Further groups by Year from post title (MM-DD-YY)
+- Clean, responsive table layout for each year's episodes
+- Elementor-style download icons for individual MP3s
+- “Download All Episodes” button (powered by custom PHP handler)
+- Year tabs within each show to reduce scroll fatigue
+- Alphabetical sorting for shows and years
+- External JavaScript file for better performance
 
 == Changelog ==
+
+= 1.0.7 =
+* Added year-level tab buttons within each show to reduce vertical scroll
+* Shows and years now sorted alphabetically
+* Updated styling and refined year/tab logic
 
 = 1.0.6 =
 * Ignored categories with the word “Season”
@@ -48,20 +52,20 @@ OTR Contributor Directory lets you build contributor profiles for your OTRWester
 * Improved download logic with Spreaker ID validation
 
 = 1.0.4 =
-* Episode listings use table layout with download buttons
+* Table layout and styling for episode listings
 * Added bulk download option
 
 = 1.0.3 =
-* Multi-tag support in shortcode (alias handling)
-* Deduplication of episode listings
+* Support for multiple tag aliases in shortcode
+* Deduplicates episodes appearing under multiple tags
 
 = 1.0.2 =
-* Fixed duplicate episodes when multiple tags matched
+* Prevented duplicate episodes in grouped listings
 
 = 1.0.1 =
-* Initial release: grouping by show/year, PowerPress integration
+* Initial release with grouping and PowerPress support
 
 == Upgrade Notice ==
 
-= 1.0.6 =
-Improved episode grouping, download logic, and visual enhancements
+= 1.0.7 =
+Added nested year tabs and sorted show/year lists for a cleaner, more organized interface.
