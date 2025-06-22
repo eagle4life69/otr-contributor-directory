@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.0.6.1
+Version: 1.0.6.2
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -140,15 +140,16 @@ wp_reset_postdata();
     echo '<div class="tabs">';
     $tab_index = 0;
     foreach (array_keys($episodes_by_show) as \$show_name) {
-    \$years = \$episodes_by_show[\$show_name];
-        echo '<button class="tab-button" onclick="showTab(' . $tab_index . ')">' . esc_html($show) . '</button>';
+    $years = \$episodes_by_show[\$show_name];
+        echo '<button class="tab-button" onclick="showTab(' . $tab_index . ')">' . esc_html($show_name) . '</button>';
         $tab_index++;
     }
     echo '</div>';
 
     $tab_index = 0;
-    foreach (array_keys($episodes_by_show) as \$show_name) {
-    \$years = \$episodes_by_show[\$show_name];
+    foreach (array_keys($episodes_by_show) as $show_name) {
+    $years = $episodes_by_show[$show_name];
+
         echo '<div class="tab-content" id="tab-' . $tab_index . '" style="display: ' . ($tab_index === 0 ? 'block' : 'none') . '">';
         foreach ($years as $year => $episodes) {
           // Sort episodes by date
