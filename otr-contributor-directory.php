@@ -139,8 +139,8 @@ wp_reset_postdata();
 
     echo '<div class="tabs">';
     $tab_index = 0;
-    foreach (array_keys($episodes_by_show) as \$show_name) {
-    $years = \$episodes_by_show[\$show_name];
+    foreach (array_keys($episodes_by_show) as $show_name) {
+    $years = $episodes_by_show[$show_name];
         echo '<button class="tab-button" onclick="showTab(' . $tab_index . ')">' . esc_html($show_name) . '</button>';
         $tab_index++;
     }
