@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.1.2
+Version: 1.1.1.2
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -24,11 +24,19 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - Includes release date in table alongside episode titles
 - Clean table layout with Elementor-style download icons
 - Includes a "Download All Episodes" button using custom handler
+- Download and release date columns aligned to right edge
 - Alphabetically ordered shows and years
 - Nested year tab buttons per show to reduce scrolling
 - Adds visible show headers with thin horizontal separators
 - External JavaScript and CSS for better performance and maintenance
 - Optimized duplicate checks and memory usage in episode listing
+
+== Changelog ==
+
+= 1.1.1.2 =
+* Updated CSS to match Elementor-style layout from related plugin
+* Aligned Download and Release Date columns to the far right
+
 */
 
 if (!defined('ABSPATH')) exit;
