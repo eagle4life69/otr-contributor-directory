@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.1.0
+Version: 1.1.1
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -21,6 +21,7 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - Ignores categories with "Season" in the name
 - Groups further by Year (parsed from title in MM-DD-YY format)
 - Displays PowerPress download links for each episode
+- Includes release date in table alongside episode titles
 - Clean table layout with Elementor-style download icons
 - Includes a "Download All Episodes" button using custom handler
 - Alphabetically ordered shows and years
@@ -173,14 +174,16 @@ wp_reset_postdata();
             });
             echo '<div class="year-content tab-' . $tab_index . '-year-' . $year_index . '" style="display:' . ($year_index === 0 ? 'block' : 'none') . '">';
             echo '<h3>' . esc_html($year) . '</h3>';
-            echo '<table class="otr-table"><thead><tr><th>Episode Title</th><th>Download</th></tr></thead><tbody>';
+            echo '<table class="otr-table"><thead><tr><th>Episode Title</th><th>Release Date</th><th>Download</th></tr></thead><tbody>';
             foreach ($episodes as $ep) {
                 echo '<tr>';
+                echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
+                echo '<td>' . esc_html($ep['date']) . '</td>';
                 echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
                 echo '<td>';
                 if ($ep['eid'] && $ep['download']) {
                     echo '<a class="otr-download-button" href="' . esc_url($ep['download']) . '" target="_blank" rel="noopener noreferrer" title="Download">';
-                    echo '<span class="elementor-icon-list-icon"><i class="fas fa-cloud-download-alt"></i></span></a>';
+                    echo '<i class="fas fa-cloud-download-alt"></i></a>';
                 }
                 echo '</td>';
                 echo '</tr>';
@@ -190,7 +193,7 @@ wp_reset_postdata();
             $eid_list = implode(',', $eids);
             echo '<div class="otr-download-all">';
             if ($eid_list) {
-                echo '<a class="otr-download-button" target="_blank" href="https://www.otrwesterns.com/mp3/download.php?ep=' . esc_attr($eid_list) . '">Download All Episodes</a>';
+                echo '<a class="otr-download-button" target="_blank" href="https://www.otrwesterns.com/mp3/download.php?ep=' . esc_attr($eid_list) . '"><i class="fas fa-cloud-download-alt"></i> Download All Episodes</a>';
             }
             echo '</div>';
             echo '</div>';
