@@ -3,7 +3,7 @@ Contributors: eagle4life69
 Tags: actors, old time radio, podcast, shortcode, directory  
 Requires at least: 5.0  
 Tested up to: 6.5
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 Requires PHP: 7.2  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -39,6 +39,8 @@ OTR Contributor Directory lets you build contributor pages for your OTRWesterns.
 - Optimized duplicate checks and memory usage in episode listing
 
 == Changelog ==
+==1.1.3==
+* Aded open titles in new windows when clicked
 
 = 1.1.1.2 =
 * Updated CSS to match Elementor-style layout from related plugin
