@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.0.8
+Version: 1.0.9
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -25,7 +25,7 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - Includes a "Download All Episodes" button using custom handler
 - Alphabetically ordered shows and years
 - Nested year tab buttons per show to reduce scrolling
-- Adds visible show headers and separators for better UX
+- Adds visible show headers with thin horizontal separators
 - External JavaScript file for better performance and maintenance
 */
 
@@ -155,8 +155,9 @@ wp_reset_postdata();
     $years = $episodes_by_show[$show_name];
 
         echo '<div class="tab-content" id="tab-' . $tab_index . '" style="display: ' . ($tab_index === 0 ? 'block' : 'none') . '">';
-echo '<h2 class="otr-show-header">' . esc_html($show_name) . '</h2>';
-echo '<hr class="otr-divider">';
+        echo '<hr class="otr-divider" style="margin: 8px 0; border-top: 1px solid #ccc;">';
+        echo '<h2 class="otr-show-header">' . esc_html($show_name) . '</h2>';
+
         ksort($years);
         echo '<div class="year-tabs">';
         foreach (array_keys($years) as $i => $year) {
