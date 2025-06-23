@@ -3,7 +3,7 @@ Contributors: eagle4life69
 Tags: actors, old time radio, podcast, shortcode, directory  
 Requires at least: 5.0  
 Tested up to: 6.5  
-Stable tag: 1.1.1  
+Stable tag: 1.1.1.2  
 Requires PHP: 7.2  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -24,31 +24,31 @@ OTR Contributor Directory lets you build contributor pages for your OTRWesterns.
 
 == Features ==
 
-- Group episodes by root Show category (ignores "Season" categories)
-- Further group by Year (parsed from post title)
-- Includes episode title, release date, and download link in table
-- Uses Elementor-style icons for individual downloads
-- Includes “Download All Episodes” button with custom Spreaker handler
-- Shows and years are sorted alphabetically and chronologically
-- Year-level navigation tabs within each show section
-- Responsive table layout with minimal scrolling
-- Modular external CSS and JavaScript for performance
-- Optimized episode deduplication logic
+- Automatically groups episodes by Show (via root category)
+- Ignores categories with "Season" in the name
+- Groups further by Year (parsed from title in MM-DD-YY format)
+- Displays PowerPress download links for each episode
+- Includes release date in table alongside episode titles
+- Clean table layout with Elementor-style download icons
+- Includes a "Download All Episodes" button using custom handler
+- Download and release date columns aligned to right edge
+- Alphabetically ordered shows and years
+- Nested year tab buttons per show to reduce scrolling
+- Adds visible show headers with thin horizontal separators
+- External JavaScript and CSS for better performance and maintenance
+- Optimized duplicate checks and memory usage in episode listing
 
 == Changelog ==
 
+= 1.1.1.2 =
+* Updated CSS to match Elementor-style layout from related plugin
+* Aligned Download and Release Date columns to the far right
+* Added text alignment and spacing rules for consistent layout
+
+= 1.1.1.1 =
+* Added visual horizontal divider and header styling per show
+* Fixed year-tab JavaScript bug in multi-show layout
+
 = 1.1.1 =
 * Added release date column to episode table
-* Fixed display and spacing issues with download icon
-* Finalized styling for header divider
-
-= 1.1.0 =
-* Externalized CSS for maintainability
-* Optimized duplicate episode detection
-* Improved visual layout and spacing
-* JavaScript bug fix for year switching
-
-= 1.0.9 =
-* Added small horizontal line and visual header per show
-* Scoped JavaScript fixes for year tab switching
-* Cleaned layout margins and styles
+* Finalized styling and layout structure for responsiveness
