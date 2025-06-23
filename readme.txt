@@ -3,7 +3,7 @@ Contributors: eagle4life69
 Tags: actors, old time radio, podcast, shortcode, directory  
 Requires at least: 5.0  
 Tested up to: 6.5  
-Stable tag: 1.1.0  
+Stable tag: 1.1.1  
 Requires PHP: 7.2  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -26,17 +26,21 @@ OTR Contributor Directory lets you build contributor pages for your OTRWesterns.
 
 - Group episodes by root Show category (ignores "Season" categories)
 - Further group by Year (parsed from post title)
-- Elementor-style tables for each year's episodes
-- Individual MP3 download buttons from PowerPress enclosures
-- “Download All Episodes” button using a custom handler
-- Shows sorted alphabetically
-- Years sorted chronologically within each show
-- Nested year tabs per show to reduce scrolling
-- Show headers and subtle horizontal dividers for clarity
-- External JavaScript and CSS files for better performance
+- Includes episode title, release date, and download link in table
+- Uses Elementor-style icons for individual downloads
+- Includes “Download All Episodes” button with custom Spreaker handler
+- Shows and years are sorted alphabetically and chronologically
+- Year-level navigation tabs within each show section
+- Responsive table layout with minimal scrolling
+- Modular external CSS and JavaScript for performance
 - Optimized episode deduplication logic
 
 == Changelog ==
+
+= 1.1.1 =
+* Added release date column to episode table
+* Fixed display and spacing issues with download icon
+* Finalized styling for header divider
 
 = 1.1.0 =
 * Externalized CSS for maintainability
@@ -48,12 +52,3 @@ OTR Contributor Directory lets you build contributor pages for your OTRWesterns.
 * Added small horizontal line and visual header per show
 * Scoped JavaScript fixes for year tab switching
 * Cleaned layout margins and styles
-
-= 1.0.8 =
-* Added nested year tabs per show
-* Sorted shows and years alphabetically
-* Improved styling and structure
-
-= 1.0.7 =
-* Initial release of grouped episode layout
-* Integrated Elementor-style download buttons
