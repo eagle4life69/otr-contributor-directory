@@ -5,14 +5,18 @@ function showTab(index) {
 }
 
 function showYearTab(showIndex, yearIndex) {
-  // Hide all year content within the current show tab
-  document.querySelectorAll(`.tab-${showIndex}-year-*`).forEach(el => {
-    el.style.display = "none";
-  });
+  // Hide all year-content blocks inside the selected show tab
+  document
+    .querySelectorAll(`.tab-content#tab-${showIndex} .year-content`)
+    .forEach(el => {
+      el.style.display = "none";
+    });
 
-  // Show the selected year tab content
-  const yearContent = document.querySelector(`.tab-${showIndex}-year-${yearIndex}`);
-  if (yearContent) {
-    yearContent.style.display = "block";
+  // Show only the selected year block
+  const yearBlock = document.querySelector(
+    `.tab-content#tab-${showIndex} .tab-${showIndex}-year-${yearIndex}`
+  );
+  if (yearBlock) {
+    yearBlock.style.display = "block";
   }
 }
