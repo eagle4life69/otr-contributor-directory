@@ -5,9 +5,14 @@ function showTab(index) {
 }
 
 function showYearTab(showIndex, yearIndex) {
-  document.querySelectorAll(`.year-content.tab-${showIndex}-year-*`).forEach(el => {
+  // Hide all year content within the current show tab
+  document.querySelectorAll(`.tab-${showIndex}-year-*`).forEach(el => {
     el.style.display = "none";
   });
-  const el = document.querySelector(`.year-content.tab-${showIndex}-year-${yearIndex}`);
-  if (el) el.style.display = "block";
+
+  // Show the selected year tab content
+  const yearContent = document.querySelector(`.tab-${showIndex}-year-${yearIndex}`);
+  if (yearContent) {
+    yearContent.style.display = "block";
+  }
 }
