@@ -35,8 +35,8 @@
 
 .otr-table th:last-child,
 .otr-table td:last-child,
-.otr-table th:nth-last-child(1),
-.otr-table td:nth-last-child(1) {
+.otr-table th:nth-last-child(3),
+.otr-table td:nth-last-child(3) {
   width: auto;
 }
 .otr-table th:nth-last-child(2),
@@ -48,8 +48,8 @@
   max-width: 140px;
 }
 
-.otr-table th:nth-last-child(3),
-.otr-table td:nth-last-child(3) {
+.otr-table th:nth-last-child(1),
+.otr-table td:nth-last-child(1) {
   width: 80px;
   min-width: 80px;
   max-width: 80px;
