@@ -3,7 +3,7 @@ Contributors: eagle4life69
 Tags: actors, old time radio, podcast, shortcode, directory  
 Requires at least: 5.0  
 Tested up to: 6.5  
-Stable tag: 1.0.7  
+Stable tag: 1.0.8  
 Requires PHP: 7.2  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -12,7 +12,7 @@ A dynamic plugin that displays grouped episode listings by show and year for act
 
 == Description ==
 
-OTR Contributor Directory lets you build contributor pages for your OTRWesterns.com podcast. It dynamically lists episodes featuring each contributor, grouped by show and year, and styled for easy navigation and quick access to downloads. Ideal for highlighting actors, writers, or other roles.
+OTR Contributor Directory lets you build contributor pages for your OTRWesterns.com podcast. It dynamically lists episodes featuring each contributor, grouped by show and year, with clean, styled tables and download options. Built for fans of classic radio and structured to support PowerPress and Spreaker-based podcasts.
 
 == How to Use ==
 
@@ -24,48 +24,51 @@ OTR Contributor Directory lets you build contributor pages for your OTRWesterns.
 
 == Features ==
 
-- Automatically groups episodes by Show (from root category)
-- Ignores categories with "Season" in the name
-- Further groups by Year from post title (MM-DD-YY)
-- Clean, responsive table layout for each year's episodes
-- Elementor-style download icons for individual MP3s
-- “Download All Episodes” button (powered by custom PHP handler)
-- Year tabs within each show to reduce scroll fatigue
-- Alphabetical sorting for shows and years
-- External JavaScript file for better performance
+- Group episodes by root Show category (ignores subcategories with “Season”)
+- Further group by Year from post title (MM-DD-YY)
+- Display each year’s episodes in a clean table layout
+- Individual download buttons for each episode (PowerPress MP3)
+- “Download All Episodes” button powered by custom handler
+- Shows sorted alphabetically
+- Years sorted chronologically within each show
+- Nested year tab buttons per show for easier navigation
+- Visible show headers and horizontal lines for better UX
+- Elementor-style download icons
+- JavaScript and CSS enqueued externally
 
 == Changelog ==
 
+= 1.0.8 =
+* Added visible headers for each show category
+* Inserted horizontal lines between show and year groups
+* Improved UI clarity with year tab buttons and grouped views
+
 = 1.0.7 =
-* Added year-level tab buttons within each show to reduce vertical scroll
-* Shows and years now sorted alphabetically
-* Updated styling and refined year/tab logic
+* Year tabs added to reduce scrolling
+* Sorted shows and years alphabetically
+* Finalized integration with Elementor icon styles
 
 = 1.0.6 =
-* Ignored categories with the word “Season”
-* Alphabetical sorting of show tabs
-* Integrated Elementor-style icons for downloads
-* Linked “Download All” to custom PHP handler
+* Skips categories with “Season”
+* Cleaned up structure and download logic
 
 = 1.0.5 =
 * Externalized JavaScript
-* Improved download logic with Spreaker ID validation
+* Improved individual and bulk download handling
 
 = 1.0.4 =
-* Table layout and styling for episode listings
-* Added bulk download option
+* Introduced clean table layout and bulk download button
 
 = 1.0.3 =
-* Support for multiple tag aliases in shortcode
-* Deduplicates episodes appearing under multiple tags
+* Allowed multiple tag names (aliases) per shortcode
 
 = 1.0.2 =
 * Prevented duplicate episodes in grouped listings
 
 = 1.0.1 =
-* Initial release with grouping and PowerPress support
+* Initial release with grouping and PowerPress integration
 
 == Upgrade Notice ==
 
-= 1.0.7 =
-Added nested year tabs and sorted show/year lists for a cleaner, more organized interface.
+= 1.0.8 =
+UI update: headers and dividers for show groups, better layout and navigation
