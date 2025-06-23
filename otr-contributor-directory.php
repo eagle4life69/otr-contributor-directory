@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.0.9
+Version: 1.1.0
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -26,7 +26,8 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - Alphabetically ordered shows and years
 - Nested year tab buttons per show to reduce scrolling
 - Adds visible show headers with thin horizontal separators
-- External JavaScript file for better performance and maintenance
+- External JavaScript and CSS for better performance and maintenance
+- Optimized duplicate checks and memory usage in episode listing
 */
 
 if (!defined('ABSPATH')) exit;
@@ -62,15 +63,15 @@ function ocd_render_contributor($atts) {
     $query = new WP_Query($args);
 
     $episodes_by_show = [];
-    $seen_post_ids = [];
+    $seen_post_ids = []; // use associative array for faster lookup
 
 while ($query->have_posts()) {
     $query->the_post();
     $post_id = get_the_ID();
 
     // Skip duplicate posts
-    if (in_array($post_id, $seen_post_ids)) continue;
-    $seen_post_ids[] = $post_id;
+    if (isset($seen_post_ids[$post_id])) continue;
+    $seen_post_ids[$post_id] = true;
 
     $full = get_the_title();
 
@@ -179,7 +180,7 @@ wp_reset_postdata();
                 echo '<td>';
                 if ($ep['eid'] && $ep['download']) {
                     echo '<a class="otr-download-button" href="' . esc_url($ep['download']) . '" target="_blank" rel="noopener noreferrer" title="Download">';
-                    echo '<span class="elementor-icon-list-icon"><i class="fas fa-cloud-download-alt"></i></span> Download</a>';
+                    echo '<span class="elementor-icon-list-icon"><i class="fas fa-cloud-download-alt"></i></span></a>';
                 }
                 echo '</td>';
                 echo '</tr>';
@@ -208,33 +209,6 @@ add_shortcode('otr_contributor', 'ocd_render_contributor');
 
 // Basic styles
 function ocd_enqueue_styles() {
-    echo '<style>
-        .tab-button { margin: 0 5px; padding: 6px 12px; cursor: pointer; }
-        .tab-content { margin-top: 10px; }
-        .otr-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .otr-table th, .otr-table td { padding: 8px 10px; border: 1px solid #ccc; text-align: left; }
-        .otr-table th { background-color: #f4f4f4; }
-        .otr-download-all { margin: 10px 0; text-align: right; }
-        .otr-download-button {
-            display: inline-block;
-            padding: 6px 12px;
-            background-color: #0073aa;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-        .otr-download-button:hover {
-            background-color: #005177;
-        }
-        .otr-divider {
-            border: none;
-            border-top: 2px solid #ddd;
-            margin: 20px 0 10px;
-        }
-        .otr-show-header {
-            font-size: 1.5em;
-            margin-bottom: 5px;
-        }
-    </style>';
+    wp_enqueue_style('otr-contributor-style', plugins_url('otr-contributor.css', __FILE__));
 }
-add_action('wp_head', 'ocd_enqueue_styles');
+add_action('wp_enqueue_scripts', 'ocd_enqueue_styles');
