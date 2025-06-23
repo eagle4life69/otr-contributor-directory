@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.1.2
+Version: 1.1.3
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -185,7 +185,7 @@ wp_reset_postdata();
             echo '<table class="otr-table"><thead><tr><th>Episode Title</th><th>Release Date</th><th>Download</th></tr></thead><tbody>';
             foreach ($episodes as $ep) {
                 echo '<tr>';
-                echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
+                echo '<td><a href="' . esc_url($ep['permalink']) . '" target="_blank">' . esc_html($ep['title']) . '</a></td>';
                 echo '<td>' . esc_html($ep['date']) . '</td>';
                 echo '<td>';
                 if ($ep['eid'] && $ep['download']) {
