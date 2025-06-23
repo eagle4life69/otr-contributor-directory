@@ -1,0 +1,55 @@
+.tab-button {
+  margin: 0 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.tab-content {
+  margin-top: 10px;
+}
+
+.otr-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.otr-table th,
+.otr-table td {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.otr-table th {
+  background-color: #f4f4f4;
+}
+
+.otr-download-all {
+  margin: 10px 0;
+  text-align: right;
+}
+
+.otr-download-button {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: #0073aa;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.otr-download-button:hover {
+  background-color: #005177;
+}
+
+.otr-divider {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 8px 0;
+}
+
+.otr-show-header {
+  font-size: 1.5em;
+  margin-bottom: 5px;
+}
