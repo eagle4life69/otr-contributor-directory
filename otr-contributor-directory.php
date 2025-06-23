@@ -179,7 +179,6 @@ wp_reset_postdata();
                 echo '<tr>';
                 echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
                 echo '<td>' . esc_html($ep['date']) . '</td>';
-                echo '<td><a href="' . esc_url($ep['permalink']) . '">' . esc_html($ep['title']) . '</a></td>';
                 echo '<td>';
                 if ($ep['eid'] && $ep['download']) {
                     echo '<a class="otr-download-button" href="' . esc_url($ep['download']) . '" target="_blank" rel="noopener noreferrer" title="Download">';
