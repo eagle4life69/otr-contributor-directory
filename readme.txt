@@ -3,7 +3,7 @@ Contributors: eagle4life69
 Tags: actors, old time radio, podcast, shortcode, directory  
 Requires at least: 5.0  
 Tested up to: 6.5
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 Requires PHP: 7.2  
 License: GPLv2 or later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -39,8 +39,12 @@ OTR Contributor Directory lets you build contributor pages for your OTRWesterns.
 - External JavaScript and CSS for better performance and maintenance
 - Optimized duplicate checks and memory usage in episode listing
 - Native GitHub update support through the WordPress Plugins screen
+- Supports the WordPress Enable/Disable auto-updates control
 
 == Changelog ==
+
+= 1.1.5 =
+* Added support for WordPress's Enable/Disable auto-updates control for the native GitHub updater.
 
 = 1.1.4 =
 * Added scheduled (future) posts to contributor episode listings so episodes remain visible when their WordPress publish date is rescheduled.
