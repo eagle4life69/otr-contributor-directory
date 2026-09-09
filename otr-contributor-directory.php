@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.1.3
+Version: 1.1.4
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -22,6 +22,7 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - Groups further by Year (parsed from title in MM-DD-YY format)
 - Displays PowerPress download links for each episode
 - Includes release date in table alongside episode titles
+- Includes published and scheduled episodes so rescheduled feed items remain listed
 - Clean table layout with Elementor-style download icons
 - Includes a "Download All Episodes" button using custom handler
 - Download and release date columns aligned to right edge
@@ -30,8 +31,13 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - Adds visible show headers with thin horizontal separators
 - External JavaScript and CSS for better performance and maintenance
 - Optimized duplicate checks and memory usage in episode listing
+- Native GitHub update support through the WordPress Plugins screen
 
 == Changelog ==
+
+= 1.1.4 =
+* Include scheduled (future) episodes in contributor listings
+* Add native GitHub update support
 
 = 1.1.1.2 =
 * Updated CSS to match Elementor-style layout from related plugin
@@ -40,6 +46,11 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 */
 
 if (!defined('ABSPATH')) exit;
+
+define('OCD_VERSION', '1.1.4');
+define('OCD_PLUGIN_FILE', __FILE__);
+
+require_once __DIR__ . '/github-updater.php';
 
 // Register Custom Post Type for Contributors
 function ocd_register_contributor_cpt() {
@@ -67,6 +78,7 @@ function ocd_render_contributor($atts) {
     $args = [
         'post_type' => 'post',
         'posts_per_page' => -1,
+        'post_status' => ['publish', 'future'],
         'tag_slug__in' => $tags,
     ];
     $query = new WP_Query($args);
@@ -144,7 +156,6 @@ while ($query->have_posts()) {
 }
 wp_reset_postdata();
 
-
     ob_start();
     echo '<div class="otr-contributor-directory">';
     echo '<h2>' . esc_html(str_replace('_', ' ', $tags[0])) . '</h2>';
@@ -153,7 +164,7 @@ wp_reset_postdata();
     $tab_index = 0;
     ksort($episodes_by_show);
     foreach (array_keys($episodes_by_show) as $show_name) {
-    $years = $episodes_by_show[$show_name];
+        $years = $episodes_by_show[$show_name];
         echo '<button class="tab-button" onclick="showTab(' . $tab_index . ')">' . esc_html($show_name) . '</button>';
         $tab_index++;
     }
@@ -162,7 +173,7 @@ wp_reset_postdata();
     $tab_index = 0;
     ksort($episodes_by_show);
     foreach (array_keys($episodes_by_show) as $show_name) {
-    $years = $episodes_by_show[$show_name];
+        $years = $episodes_by_show[$show_name];
 
         echo '<div class="tab-content" id="tab-' . $tab_index . '" style="display: ' . ($tab_index === 0 ? 'block' : 'none') . '">';
         echo '<hr class="otr-divider" style="margin: 8px 0; border-top: 1px solid #ccc;">';
