@@ -2,7 +2,7 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.1.4
+Version: 1.1.5
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
@@ -32,8 +32,12 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 - External JavaScript and CSS for better performance and maintenance
 - Optimized duplicate checks and memory usage in episode listing
 - Native GitHub update support through the WordPress Plugins screen
+- Supports WordPress Enable/Disable auto-updates control
 
 == Changelog ==
+
+= 1.1.5 =
+* Add WordPress auto-update toggle support for the custom GitHub updater
 
 = 1.1.4 =
 * Include scheduled (future) episodes in contributor listings
@@ -47,7 +51,7 @@ OTR Contributor Directory helps you display episode appearances by actors, write
 
 if (!defined('ABSPATH')) exit;
 
-define('OCD_VERSION', '1.1.4');
+define('OCD_VERSION', '1.1.5');
 define('OCD_PLUGIN_FILE', __FILE__);
 
 require_once __DIR__ . '/github-updater.php';
@@ -84,19 +88,14 @@ function ocd_render_contributor($atts) {
     $query = new WP_Query($args);
 
     $episodes_by_show = [];
-    $seen_post_ids = []; // use associative array for faster lookup
+    $seen_post_ids = [];
 
 while ($query->have_posts()) {
     $query->the_post();
     $post_id = get_the_ID();
-
-    // Skip duplicate posts
     if (isset($seen_post_ids[$post_id])) continue;
     $seen_post_ids[$post_id] = true;
-
     $full = get_the_title();
-
-    // Parse MM-DD-YY from title
     preg_match('/\((\d{2})-(\d{2})-(\d{2})\)$/', $full, $m);
     $month = $m[1] ?? '';
     $day   = $m[2] ?? '';
@@ -104,16 +103,12 @@ while ($query->have_posts()) {
     $date  = ($month && $day && $year) ? "$month-$day-19$year" : '';
     $sortable = ($year && $month && $day) ? intval("19$year$month$day") : 0;
     $year_full = ($year) ? "19$year" : 'Unknown';
-
-    // Title parsing logic
     if (strpos($full, ' | ') !== false) {
         $parts = explode(' | ', $full);
     } else {
         $parts = explode(' – ', $full);
     }
     $title = $parts[0];
-
-    // Get MP3 + Episode ID
     $meta = get_post_meta($post_id, 'enclosure', true);
     $mp3 = '';
     $eid = '';
@@ -129,7 +124,6 @@ while ($query->have_posts()) {
             }
         }
     }
-
     $categories = get_the_category();
     $root_cat = 'Unknown';
     if ($categories) {
@@ -140,10 +134,8 @@ while ($query->have_posts()) {
             }
         }
     }
-
     if (!isset($episodes_by_show[$root_cat])) $episodes_by_show[$root_cat] = [];
     if (!isset($episodes_by_show[$root_cat][$year_full])) $episodes_by_show[$root_cat][$year_full] = [];
-
     $episodes_by_show[$root_cat][$year_full][] = [
         'title' => $title,
         'date' => $date,
@@ -159,38 +151,30 @@ wp_reset_postdata();
     ob_start();
     echo '<div class="otr-contributor-directory">';
     echo '<h2>' . esc_html(str_replace('_', ' ', $tags[0])) . '</h2>';
-
     echo '<div class="tabs">';
     $tab_index = 0;
     ksort($episodes_by_show);
     foreach (array_keys($episodes_by_show) as $show_name) {
-        $years = $episodes_by_show[$show_name];
         echo '<button class="tab-button" onclick="showTab(' . $tab_index . ')">' . esc_html($show_name) . '</button>';
         $tab_index++;
     }
     echo '</div>';
-
     $tab_index = 0;
     ksort($episodes_by_show);
     foreach (array_keys($episodes_by_show) as $show_name) {
         $years = $episodes_by_show[$show_name];
-
         echo '<div class="tab-content" id="tab-' . $tab_index . '" style="display: ' . ($tab_index === 0 ? 'block' : 'none') . '">';
         echo '<hr class="otr-divider" style="margin: 8px 0; border-top: 1px solid #ccc;">';
         echo '<h2 class="otr-show-header">' . esc_html($show_name) . '</h2>';
-
         ksort($years);
         echo '<div class="year-tabs">';
         foreach (array_keys($years) as $i => $year) {
             echo '<button class="tab-button year-tab" onclick="showYearTab(' . $tab_index . ', ' . $i . ')">' . esc_html($year) . '</button>';
         }
         echo '</div>';
-
         $year_index = 0;
         foreach ($years as $year => $episodes) {
-            usort($episodes, function ($a, $b) {
-                return $a['sortable'] <=> $b['sortable'];
-            });
+            usort($episodes, function ($a, $b) { return $a['sortable'] <=> $b['sortable']; });
             echo '<div class="year-content tab-' . $tab_index . '-year-' . $year_index . '" style="display:' . ($year_index === 0 ? 'block' : 'none') . '">';
             echo '<h3>' . esc_html($year) . '</h3>';
             echo '<table class="otr-table"><thead><tr><th>Episode Title</th><th>Release Date</th><th>Download</th></tr></thead><tbody>';
@@ -203,8 +187,7 @@ wp_reset_postdata();
                     echo '<a class="otr-download-button" href="' . esc_url($ep['download']) . '" target="_blank" rel="noopener noreferrer" title="Download">';
                     echo '<i class="fas fa-cloud-download-alt"></i></a>';
                 }
-                echo '</td>';
-                echo '</tr>';
+                echo '</td></tr>';
             }
             echo '</tbody></table>';
             $eids = array_filter(array_column($episodes, 'eid'));
@@ -213,22 +196,18 @@ wp_reset_postdata();
             if ($eid_list) {
                 echo '<a class="otr-download-button" target="_blank" href="https://www.otrwesterns.com/mp3/download.php?ep=' . esc_attr($eid_list) . '"><i class="fas fa-cloud-download-alt"></i> Download All Episodes</a>';
             }
-            echo '</div>';
-            echo '</div>';
+            echo '</div></div>';
             $year_index++;
         }
         echo '</div>';
         $tab_index++;
     }
-
     echo '</div>';
     wp_enqueue_script('otr-contributor-js', plugins_url('otr-contributor.js', __FILE__), [], null, true);
-
     return ob_get_clean();
 }
 add_shortcode('otr_contributor', 'ocd_render_contributor');
 
-// Basic styles
 function ocd_enqueue_styles() {
     wp_enqueue_style('otr-contributor-style', plugins_url('otr-contributor.css', __FILE__));
 }
