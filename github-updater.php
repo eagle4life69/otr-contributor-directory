@@ -2,23 +2,24 @@
 /**
  * Native GitHub updater for OTR Contributor Directory.
  *
- * Checks the public main branch for a newer plugin version and lets
- * WordPress install it through the normal Plugins update interface.
+ * Checks the latest published GitHub Release and lets WordPress install it
+ * through the normal Plugins update interface.
  */
 
 if (!defined('ABSPATH')) exit;
 
-function ocd_github_get_remote_version() {
-    $cache_key = 'ocd_github_remote_version';
+function ocd_github_get_latest_release() {
+    $cache_key = 'ocd_github_latest_release';
     $cached = get_transient($cache_key);
     if ($cached !== false) {
         return $cached;
     }
 
-    $url = 'https://raw.githubusercontent.com/eagle4life69/otr-contributor-directory/main/otr-contributor-directory.php';
+    $url = 'https://api.github.com/repos/eagle4life69/otr-contributor-directory/releases/latest';
     $response = wp_remote_get($url, [
         'timeout' => 10,
         'headers' => [
+            'Accept' => 'application/vnd.github+json',
             'User-Agent' => 'OTR-Contributor-Directory/' . OCD_VERSION,
         ],
     ]);
@@ -27,24 +28,30 @@ function ocd_github_get_remote_version() {
         return false;
     }
 
-    $body = wp_remote_retrieve_body($response);
-    if (!preg_match('/^\s*Version:\s*(.+)$/mi', $body, $matches)) {
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+    if (empty($data['tag_name']) || empty($data['zipball_url'])) {
         return false;
     }
 
-    $version = trim($matches[1]);
-    set_transient($cache_key, $version, 6 * HOUR_IN_SECONDS);
-    return $version;
+    $release = [
+        'version' => ltrim(trim($data['tag_name']), 'vV'),
+        'package' => esc_url_raw($data['zipball_url']),
+        'url' => !empty($data['html_url']) ? esc_url_raw($data['html_url']) : 'https://github.com/eagle4life69/otr-contributor-directory/releases',
+        'body' => !empty($data['body']) ? (string) $data['body'] : '',
+    ];
+
+    set_transient($cache_key, $release, 15 * MINUTE_IN_SECONDS);
+    return $release;
 }
 
-function ocd_github_build_update_object($version, $plugin_file) {
+function ocd_github_build_update_object($release, $plugin_file) {
     $update = new stdClass();
     $update->id = 'https://github.com/eagle4life69/otr-contributor-directory';
     $update->slug = 'otr-contributor-directory';
     $update->plugin = $plugin_file;
-    $update->new_version = $version;
-    $update->url = 'https://github.com/eagle4life69/otr-contributor-directory';
-    $update->package = 'https://github.com/eagle4life69/otr-contributor-directory/archive/refs/heads/main.zip';
+    $update->new_version = $release['version'];
+    $update->url = $release['url'];
+    $update->package = $release['package'];
     $update->tested = '';
     $update->requires_php = '7.2';
     return $update;
@@ -62,15 +69,15 @@ function ocd_github_check_for_update($transient) {
     }
 
     $plugin_file = plugin_basename(OCD_PLUGIN_FILE);
-    $remote_version = ocd_github_get_remote_version();
+    $release = ocd_github_get_latest_release();
 
-    if (!$remote_version) {
+    if (!$release) {
         return $transient;
     }
 
-    $update = ocd_github_build_update_object($remote_version, $plugin_file);
+    $update = ocd_github_build_update_object($release, $plugin_file);
 
-    if (version_compare(OCD_VERSION, $remote_version, '<')) {
+    if (version_compare(OCD_VERSION, $release['version'], '<')) {
         $transient->response[$plugin_file] = $update;
         unset($transient->no_update[$plugin_file]);
     } else {
@@ -87,30 +94,26 @@ function ocd_github_plugin_information($result, $action, $args) {
         return $result;
     }
 
-    $remote_version = ocd_github_get_remote_version();
+    $release = ocd_github_get_latest_release();
 
     $info = new stdClass();
     $info->name = 'OTR Contributor Directory';
     $info->slug = 'otr-contributor-directory';
-    $info->version = $remote_version ?: OCD_VERSION;
+    $info->version = $release ? $release['version'] : OCD_VERSION;
     $info->author = '<a href="https://otrwesterns.com">Andrew Rhynes</a>';
     $info->homepage = 'https://github.com/eagle4life69/otr-contributor-directory';
     $info->requires = '5.0';
     $info->requires_php = '7.2';
-    $info->download_link = 'https://github.com/eagle4life69/otr-contributor-directory/archive/refs/heads/main.zip';
+    $info->download_link = $release ? $release['package'] : '';
     $info->sections = [
         'description' => 'Displays contributor pages with episode listings grouped by show and year.',
-        'changelog' => 'See the GitHub repository readme for the current changelog.',
+        'changelog' => $release && !empty($release['body']) ? wpautop(esc_html($release['body'])) : 'See the GitHub release notes for the current changelog.',
     ];
 
     return $info;
 }
 add_filter('plugins_api', 'ocd_github_plugin_information', 20, 3);
 
-/**
- * GitHub branch ZIPs extract as otr-contributor-directory-main.
- * Rename the extracted folder so WordPress keeps the existing plugin path.
- */
 function ocd_github_fix_source_folder($source, $remote_source, $upgrader, $hook_extra) {
     if (empty($hook_extra['plugin']) || $hook_extra['plugin'] !== plugin_basename(OCD_PLUGIN_FILE)) {
         return $source;
@@ -135,7 +138,7 @@ add_filter('upgrader_source_selection', 'ocd_github_fix_source_folder', 10, 4);
 
 function ocd_github_clear_update_cache($upgrader, $options) {
     if (!empty($options['action']) && $options['action'] === 'update' && !empty($options['type']) && $options['type'] === 'plugin') {
-        delete_transient('ocd_github_remote_version');
+        delete_transient('ocd_github_latest_release');
     }
 }
 add_action('upgrader_process_complete', 'ocd_github_clear_update_cache', 10, 2);
