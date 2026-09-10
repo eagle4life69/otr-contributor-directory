@@ -2,12 +2,15 @@
 /*
 Plugin Name: OTR Contributor Directory
 Description: Displays contributor (actor, writer, etc.) pages with grouped episode listings by show and year.
-Version: 1.1.7
+Version: 1.1.8
 Author: Andrew Rhynes
 Author URI: https://otrwesterns.com
 GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
 
 == Changelog ==
+= 1.1.8 =
+* Show the scheduled WordPress publish date next to future episode titles
+
 = 1.1.7 =
 * Keep scheduled episodes visible but remove the link to the unpublished WordPress post
 
@@ -25,7 +28,7 @@ GitHub Plugin URI: https://github.com/eagle4life69/otr-contributor-directory
 
 if (!defined('ABSPATH')) exit;
 
-define('OCD_VERSION', '1.1.7');
+define('OCD_VERSION', '1.1.8');
 define('OCD_PLUGIN_FILE', __FILE__);
 require_once __DIR__ . '/github-updater.php';
 
@@ -57,12 +60,14 @@ function ocd_render_contributor($atts) {
         $categories=get_the_category(); $root_cat='Unknown';
         if($categories){foreach($categories as $cat){if(stripos($cat->name,'Season')===false){$root_cat=$cat->name;break;}}}
         if(!isset($episodes_by_show[$root_cat]))$episodes_by_show[$root_cat]=[]; if(!isset($episodes_by_show[$root_cat][$year_full]))$episodes_by_show[$root_cat][$year_full]=[];
-        $episodes_by_show[$root_cat][$year_full][]=['title'=>$title,'date'=>$date,'sortable'=>$sortable,'mp3'=>$mp3,'eid'=>$eid,'permalink'=>get_permalink(),'download'=>$mp3,'status'=>get_post_status($post_id)];
+        $status=get_post_status($post_id);
+        $scheduled_date=($status==='future')?get_post_time('m-d-Y',false,$post_id):'';
+        $episodes_by_show[$root_cat][$year_full][]=['title'=>$title,'date'=>$date,'sortable'=>$sortable,'mp3'=>$mp3,'eid'=>$eid,'permalink'=>get_permalink(),'download'=>$mp3,'status'=>$status,'scheduled_date'=>$scheduled_date];
     }
     wp_reset_postdata(); ob_start(); echo '<div class="otr-contributor-directory"><h2>'.esc_html(str_replace('_',' ',$tags[0])).'</h2><div class="tabs">';
     $tab_index=0; ksort($episodes_by_show); foreach(array_keys($episodes_by_show) as $show_name){echo '<button class="tab-button" onclick="showTab('.$tab_index.')">'.esc_html($show_name).'</button>'; $tab_index++;} echo '</div>';
     $tab_index=0; foreach($episodes_by_show as $show_name=>$years){echo '<div class="tab-content" id="tab-'.$tab_index.'" style="display:'.($tab_index===0?'block':'none').'">'; echo '<hr class="otr-divider" style="margin: 8px 0; border-top: 1px solid #ccc;"><h2 class="otr-show-header">'.esc_html($show_name).'</h2>'; ksort($years); echo '<div class="year-tabs">'; foreach(array_keys($years) as $i=>$yr)echo '<button class="tab-button year-tab" onclick="showYearTab('.$tab_index.', '.$i.')">'.esc_html($yr).'</button>'; echo '</div>';
-        $year_index=0; foreach($years as $yr=>$episodes){usort($episodes,fn($a,$b)=>$a['sortable']<=>$b['sortable']); echo '<div class="year-content tab-'.$tab_index.'-year-'.$year_index.'" style="display:'.($year_index===0?'block':'none').'"><h3>'.esc_html($yr).'</h3><table class="otr-table"><thead><tr><th>Episode Title</th><th>Release Date</th><th>Download</th></tr></thead><tbody>'; foreach($episodes as $ep){echo '<tr><td>'; if($ep['status']==='future'){echo esc_html($ep['title']);}else{echo '<a href="'.esc_url($ep['permalink']).'" target="_blank">'.esc_html($ep['title']).'</a>';} echo '</td><td>'.esc_html($ep['date']).'</td><td>'; if($ep['eid']&&$ep['download'])echo '<a class="otr-download-button" href="'.esc_url($ep['download']).'" target="_blank" rel="noopener noreferrer" title="Download"><i class="fas fa-cloud-download-alt"></i></a>'; echo '</td></tr>';} echo '</tbody></table>'; $eid_list=implode(',',array_filter(array_column($episodes,'eid'))); echo '<div class="otr-download-all">'; if($eid_list)echo '<a class="otr-download-button" target="_blank" href="https://www.otrwesterns.com/mp3/download.php?ep='.esc_attr($eid_list).'"><i class="fas fa-cloud-download-alt"></i> Download All Episodes</a>'; echo '</div></div>'; $year_index++;} echo '</div>'; $tab_index++;}
+        $year_index=0; foreach($years as $yr=>$episodes){usort($episodes,fn($a,$b)=>$a['sortable']<=>$b['sortable']); echo '<div class="year-content tab-'.$tab_index.'-year-'.$year_index.'" style="display:'.($year_index===0?'block':'none').'"><h3>'.esc_html($yr).'</h3><table class="otr-table"><thead><tr><th>Episode Title</th><th>Release Date</th><th>Download</th></tr></thead><tbody>'; foreach($episodes as $ep){echo '<tr><td>'; if($ep['status']==='future'){echo esc_html($ep['title']); if($ep['scheduled_date'])echo ' <span class="otr-scheduled-note" style="font-size:0.85em;font-style:italic;opacity:0.75;">(Scheduled for release on '.esc_html($ep['scheduled_date']).')</span>';}else{echo '<a href="'.esc_url($ep['permalink']).'" target="_blank">'.esc_html($ep['title']).'</a>';} echo '</td><td>'.esc_html($ep['date']).'</td><td>'; if($ep['eid']&&$ep['download'])echo '<a class="otr-download-button" href="'.esc_url($ep['download']).'" target="_blank" rel="noopener noreferrer" title="Download"><i class="fas fa-cloud-download-alt"></i></a>'; echo '</td></tr>';} echo '</tbody></table>'; $eid_list=implode(',',array_filter(array_column($episodes,'eid'))); echo '<div class="otr-download-all">'; if($eid_list)echo '<a class="otr-download-button" target="_blank" href="https://www.otrwesterns.com/mp3/download.php?ep='.esc_attr($eid_list).'"><i class="fas fa-cloud-download-alt"></i> Download All Episodes</a>'; echo '</div></div>'; $year_index++;} echo '</div>'; $tab_index++;}
     echo '</div>'; wp_enqueue_script('otr-contributor-js',plugins_url('otr-contributor.js',__FILE__),[],null,true); return ob_get_clean();
 }
 add_shortcode('otr_contributor','ocd_render_contributor');
