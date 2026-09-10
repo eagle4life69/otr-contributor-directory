@@ -3,7 +3,7 @@ Contributors: eagle4life69
 Tags: actors, old time radio, podcast, shortcode, directory
 Requires at least: 5.0
 Tested up to: 6.5
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -28,12 +28,16 @@ OTR Contributor Directory lets you build contributor pages for your OTRWesterns.
 - Displays PowerPress download links for each episode
 - Includes release date in table alongside episode titles
 - Includes published and scheduled episodes so rescheduled feed items remain listed
+- Scheduled episodes remain visible with downloads, but their unpublished WordPress post titles are not linked
 - Includes a "Download All Episodes" button
 - Alphabetically ordered shows and years
 - Native GitHub update support through published GitHub Releases
 - Supports the WordPress Enable/Disable auto-updates control
 
 == Changelog ==
+
+= 1.1.7 =
+* Scheduled/future episodes remain visible with their download links, but the episode title is plain text until the WordPress post publishes.
 
 = 1.1.6 =
 * Switched native updater from the main branch to the latest published GitHub Release.
